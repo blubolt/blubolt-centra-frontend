@@ -1,0 +1,46 @@
+import React from "react";
+import type { Metadata, Viewport } from "next";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+import { generateMetadata } from "@/components/CanonicalMetadata";
+import "./globals.css";
+
+const geistSans = GeistSans;
+const geistMono = GeistMono;
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
+export const metadata: Metadata = generateMetadata({
+  path: '/',
+  title: 'Your Site Name',
+  description: 'Your site description goes here',
+  locales: ['en'],
+  additionalMetadata: {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
+    manifest: '/manifest.json',
+    icons: {
+      icon: '/favicon.ico',
+      apple: '/apple-touch-icon.png',
+    },
+  },
+});
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {children}
+      </body>
+    </html>
+  );
+}
