@@ -51,6 +51,20 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="w-full py-16 bg-gray-50">
+        <div className='container mx-auto px-4'>
+          <h2 className="text-3xl md:text-4xl font-portrait text-center mb-12 text-gray-900 font-semibold">
+            What is the blubolt Centra accelerator?
+          </h2>
+          <p className="text-lg md:text-xl text-gray-700 mb-8">
+            The blubolt Centra accelerator is starting point for your build with blubolt and Centra, it is designed to be service and style agnostic and is intended to be a starting point for your Centra build.
+          </p>
+          <p className="text-lg md:text-xl text-gray-700 mb-8">
+            Featuring some core components and features, such as a navigation bar, a footer, and a hero section, it is designed to be a starting point for your own Centra build.
+          </p>
+          </div>
+      </section>
+
       {/* Featured Categories */}
       <section className="w-full py-16 bg-white">
         <div className="container mx-auto px-4">
