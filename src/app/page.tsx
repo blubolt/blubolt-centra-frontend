@@ -33,7 +33,10 @@ export default function Home() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="w-full h-max relative">
+      <section 
+        className="w-full h-max relative bg-cover bg-center"
+        style={{ backgroundImage: 'url("/images/placeholder.jpg")' }}
+      >
         <div className="absolute inset-0 bg-black/50 z-10" />
         <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center items-center text-white text-center">
           <h1 className="mt-60 text-5xl md:text-7xl font-portrait mb-6 font-bold">
