@@ -33,18 +33,18 @@ export default function Home() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="w-full h-screen relative">
+      <section className="w-full h-max relative">
         <div className="absolute inset-0 bg-black/50 z-10" />
         <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center items-center text-white text-center">
-          <h1 className="text-5xl md:text-7xl font-portrait mb-6 font-bold">
+          <h1 className="mt-60 text-5xl md:text-7xl font-portrait mb-6 font-bold">
             blubolt x Centra
           </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-2xl text-gray-100">
+          <p className="text-xl mb-16 md:text-2xl mb-8 max-w-2xl text-gray-100">
           Welcome to the blubolt Centra accelerator
           </p>
           <Link
             href="/category/shop"
-            className="bg-white text-gray-900 px-8 py-3 text-lg font-medium hover:bg-gray-100 transition-colors"
+            className="bg-white mb-60 text-gray-900 px-8 py-3 text-lg font-medium hover:bg-gray-100 transition-colors"
           >
             Shop Now
           </Link>
@@ -115,7 +115,7 @@ export default function Home() {
           </div>
           <div className="text-center mt-12">
             <Link
-              href="/new-arrivals"
+              href="category/all/new-arrivals"
               className="inline-block border-2 border-gray-900 px-8 py-3 text-lg text-gray-900 hover:bg-gray-900 hover:text-white transition-colors font-medium"
             >
               View All New Arrivals

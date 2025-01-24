@@ -159,11 +159,11 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
           {isFilterOpen && (
             <>
               {/* Backdrop */}
-              <div 
+              <div
                 className="fixed inset-0 bg-black bg-opacity-25 z-40 transition-opacity"
                 onClick={() => setIsFilterOpen(false)}
               />
-              
+
               {/* Sidebar */}
               <div className={`fixed inset-y-0 left-0 max-w-xs w-full bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${isFilterOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="px-4 py-4 border-b border-gray-200 flex items-center justify-between">
@@ -200,7 +200,7 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
             {/* Sort Dropdown */}
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-semibold text-gray-900 capitalize">
-                {subcategory} {category}
+                {category} - {subcategory}
               </h1>
               <div className="relative">
                 <select
@@ -254,11 +254,11 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
         {quickshopProduct && (
           <>
             {/* Backdrop */}
-            <div 
+            <div
               className="fixed inset-0 bg-black bg-opacity-25 z-40 transition-opacity"
               onClick={() => setQuickshopProduct(null)}
             />
-            
+
             {/* Modal */}
             <div className="fixed inset-0 z-50 overflow-y-auto">
               <div className="flex min-h-full items-center justify-center p-4">

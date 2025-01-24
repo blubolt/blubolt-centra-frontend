@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { generateMetadata } from "@/components/CanonicalMetadata";
+import Header from "@/components/layout/Header";
 import "./globals.css";
 
 const geistSans = GeistSans;
@@ -39,7 +40,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Header />
+        <main className="min-h-screen bg-white">
+          {children}
+        </main>
       </body>
     </html>
   );

@@ -35,7 +35,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           </ol>
         </nav>
 
-        <h1 className="text-3xl font-medium mb-8 capitalize">{category}</h1>
+        <h1 className="text-3xl font-medium mb-8 text-gray-800 capitalize">{category}</h1>
 
         {/* Subcategories Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

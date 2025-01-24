@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ShoppingBagIcon, MenuIcon, XIcon } from '@heroicons/react/outline';
+import { ShoppingBagIcon, MenuIcon, XIcon, UserIcon } from '@heroicons/react/outline';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // This will be replaced with actual auth state
 
   const menuItems = [
     {
@@ -54,8 +55,11 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Cart and Mobile Menu Button */}
-          <div className="flex items-center">
+          {/* Cart, User Account, and Mobile Menu Button */}
+          <div className="flex items-center space-x-2">
+            <Link href={isLoggedIn ? '/account' : '/login'} className="p-2 hover:bg-gray-100 rounded-full">
+              <UserIcon className="h-6 w-6 text-gray-700" />
+            </Link>
             <Link href="/cart" className="p-2 relative">
               <ShoppingBagIcon className="h-6 w-6 text-gray-700" />
               {cartItemCount > 0 && (
