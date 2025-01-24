@@ -43,7 +43,7 @@ export default function Home() {
           Welcome to the blubolt Centra accelerator
           </p>
           <Link
-            href="/shop"
+            href="/category/shop"
             className="bg-white text-gray-900 px-8 py-3 text-lg font-medium hover:bg-gray-100 transition-colors"
           >
             Shop Now
