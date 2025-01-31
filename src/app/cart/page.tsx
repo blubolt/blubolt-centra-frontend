@@ -1,42 +1,14 @@
+'use client';
+
 import React from 'react';
 import Layout from '@/components/layout/Layout';
 import Link from 'next/link';
 import { MinusIcon, PlusIcon, XIcon } from '@heroicons/react/outline';
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  size: string;
-  color: string;
-  image: string;
-}
+import { useCart } from '@/contexts/CartContext';
 
 export default function CartPage() {
-  // Mock cart data - in a real app, this would come from your cart state management
-  const cartItems: CartItem[] = [
-    {
-      id: 1,
-      name: 'Cotton Blend Sweater',
-      price: 89.99,
-      quantity: 1,
-      size: 'M',
-      color: 'Black',
-      image: '/images/placeholder.jpg',
-    },
-    {
-      id: 2,
-      name: 'Relaxed Fit Jeans',
-      price: 79.99,
-      quantity: 1,
-      size: '32',
-      color: 'Blue',
-      image: '/images/placeholder.jpg',
-    },
-  ];
-
-  const subtotal: number = cartItems.reduce<number>((sum, item) => sum + item.price * item.quantity, 0);
+  const { items, removeItem, updateQuantity, getTotal } = useCart();
+  const subtotal = getTotal();
   const shipping = 0; // Free shipping
   const tax = subtotal * 0.1; // 10% tax
   const total = subtotal + shipping + tax;
@@ -49,10 +21,10 @@ export default function CartPage() {
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Cart Items */}
           <div className="lg:w-2/3">
-            {cartItems.length > 0 ? (
+            {items.length > 0 ? (
               <div className="space-y-6">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="flex gap-6 pb-6 border-b">
+                {items.map((item) => (
+                  <div key={`${item.id}-${item.color}-${item.size}`} className="flex gap-6 pb-6 border-b">
                     <div className="w-24 h-24 flex-shrink-0">
                       <img
                         src={item.image}
@@ -65,7 +37,10 @@ export default function CartPage() {
                         <Link href={`/product/${item.id}`} className="font-medium hover:underline text-gray-900">
                           {item.name}
                         </Link>
-                        <button className="text-gray-800 hover:text-gray-900">
+                        <button 
+                          className="text-gray-800 hover:text-gray-900"
+                          onClick={() => removeItem(item.id, item.color, item.size)}
+                        >
                           <XIcon className="h-5 w-5" />
                         </button>
                       </div>
@@ -77,6 +52,7 @@ export default function CartPage() {
                           <button
                             className="p-2 hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-colors duration-150 ease-in-out border-r border-gray-200"
                             aria-label="Decrease quantity"
+                            onClick={() => updateQuantity(item.id, item.color, item.size, Math.max(0, item.quantity - 1))}
                           >
                             <MinusIcon className="h-4 w-4" />
                           </button>
@@ -86,6 +62,7 @@ export default function CartPage() {
                           <button
                             className="p-2 hover:bg-gray-50 text-gray-500 hover:text-gray-700 transition-colors duration-150 ease-in-out border-l border-gray-200"
                             aria-label="Increase quantity"
+                            onClick={() => updateQuantity(item.id, item.color, item.size, item.quantity + 1)}
                           >
                             <PlusIcon className="h-4 w-4" />
                           </button>
@@ -99,10 +76,10 @@ export default function CartPage() {
             ) : (
               <div className="text-center py-12">
                 <h2 className="text-xl font-medium mb-4 text-gray-900">Your cart is empty</h2>
-                <p className="text-gray-600 mb-8 text-gray-700">Add some items to your cart to continue shopping</p>
+                <p className="text-gray-600 mb-8">Add some products to your cart to see them here.</p>
                 <Link
-                  href="/shop"
-                  className="inline-block bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-900 transition-colors"
+                  href="/"
+                  className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-md font-medium hover:bg-indigo-700 transition-colors duration-150 ease-in-out"
                 >
                   Continue Shopping
                 </Link>
@@ -111,47 +88,38 @@ export default function CartPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="lg:w-1/3">
-            <div className="bg-gray-200 rounded-lg p-6">
-              <h2 className="text-lg font-medium mb-6 text-gray-900">Order Summary</h2>
-
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="text-gray-600">${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="text-gray-600">{shipping === 0 ? 'Free' : `$${shipping}`}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Tax</span>
-                  <span className="text-gray-600">${tax.toFixed(2)}</span>
-                </div>
-                <div className="border-t pt-4">
-                  <div className="flex justify-between font-medium">
-                    <span className="text-gray-900">Total</span>
-                    <span className="text-gray-900">${total.toFixed(2)}</span>
+          {items.length > 0 && (
+            <div className="lg:w-1/3">
+              <div className="bg-gray-50 rounded-lg p-6 sticky top-6">
+                <h2 className="text-lg font-medium mb-6 text-gray-900">Order Summary</h2>
+                <div className="space-y-4">
+                  <div className="flex justify-between text-gray-600">
+                    <span>Subtotal</span>
+                    <span>${subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Shipping</span>
+                    <span>Free</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Tax</span>
+                    <span>${tax.toFixed(2)}</span>
+                  </div>
+                  <div className="border-t pt-4">
+                    <div className="flex justify-between font-medium text-gray-900">
+                      <span>Total</span>
+                      <span>${total.toFixed(2)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <button className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-900 transition-colors">
-                Proceed to Checkout
-              </button>
-
-              <div className="mt-6">
-                <h3 className="font-medium mb-4">Accepted Payment Methods</h3>
-                <div className="flex gap-2">
-                  {/* Add payment method icons here */}
-                  <div className="w-12 h-8 bg-gray-200 rounded"></div>
-                  <div className="w-12 h-8 bg-gray-200 rounded"></div>
-                  <div className="w-12 h-8 bg-gray-200 rounded"></div>
-                  <div className="w-12 h-8 bg-gray-200 rounded"></div>
-                </div>
+                <button
+                  className="w-full mt-6 bg-indigo-600 text-white px-6 py-3 rounded-md font-medium hover:bg-indigo-700 transition-colors duration-150 ease-in-out"
+                >
+                  Proceed to Checkout
+                </button>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </Layout>

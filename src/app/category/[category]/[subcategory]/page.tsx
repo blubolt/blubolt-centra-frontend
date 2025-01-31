@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
-import Layout from '@/components/layout/Layout';
-import Link from 'next/link';
-import { ChevronDownIcon, XIcon, FilterIcon } from '@heroicons/react/outline';
+import React, { useState, useEffect, useMemo } from "react";
+import Layout from "@/components/layout/Layout";
+import Link from "next/link";
+import { ChevronDownIcon, XIcon, FilterIcon } from "@heroicons/react/outline";
+import { useCart } from "@/contexts/CartContext";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   image: string;
@@ -24,104 +25,118 @@ interface SubcategoryPageProps {
 
 export default function SubcategoryPage({ params }: SubcategoryPageProps) {
   const { category, subcategory } = params;
+  const { addItem } = useCart();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortOption, setSortOption] = useState('featured');
-  const [quickshopProduct, setQuickshopProduct] = useState<Product | null>(null);
-  const [selectedColor, setSelectedColor] = useState('');
-  const [selectedSize, setSelectedSize] = useState('');
+  const [sortOption, setSortOption] = useState("featured");
+  const [quickshopProduct, setQuickshopProduct] = useState<Product | null>(
+    null
+  );
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<{
-    'Price Range': string[];
-    'Colors': string[];
-    'Sizes': string[];
-    'Material': string[];
+    "Price Range": string[];
+    Colors: string[];
+    Sizes: string[];
+    Material: string[];
   }>({
-    'Price Range': [],
-    'Colors': [],
-    'Sizes': [],
-    'Material': [],
+    "Price Range": [],
+    Colors: [],
+    Sizes: [],
+    Material: [],
   });
 
   // Handle ESC key for modals
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setIsFilterOpen(false);
         setQuickshopProduct(null);
       }
     };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
   // Lock body scroll when modal is open
   useEffect(() => {
     if (isFilterOpen || quickshopProduct) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isFilterOpen, quickshopProduct]);
 
   // Mock products data
   const products: Product[] = [
     {
-      id: 1,
-      name: 'Classic Cotton T-Shirt',
+      id: "1",
+      name: "Classic Cotton T-Shirt",
       price: 29.99,
-      image: '/images/placeholder.jpg',
-      colors: ['White', 'Black', 'Navy'],
-      sizes: ['XS', 'S', 'M', 'L', 'XL'],
-      material: 'Cotton',
+      image: "/images/placeholder.jpg",
+      colors: ["White", "Black", "Navy"],
+      sizes: ["XS", "S", "M", "L", "XL"],
+      material: "Cotton",
     },
     {
-      id: 2,
-      name: 'Slim Fit Jeans',
+      id: "2",
+      name: "Slim Fit Jeans",
       price: 79.99,
-      image: '/images/placeholder.jpg',
-      colors: ['Light Blue', 'Dark Blue', 'Black'],
-      sizes: ['28', '30', '32', '34', '36'],
-      material: 'Cotton',
+      image: "/images/placeholder.jpg",
+      colors: ["Light Blue", "Dark Blue", "Black"],
+      sizes: ["28", "30", "32", "34", "36"],
+      material: "Cotton",
     },
   ];
 
   const filters = {
-    'Price Range': ['Under $50', '$50 - $100', '$100 - $200', 'Over $200'],
-    'Colors': ['Black', 'White', 'Blue', 'Red', 'Green'],
-    'Sizes': ['XS', 'S', 'M', 'L', 'XL'],
-    'Material': ['Cotton', 'Linen', 'Silk', 'Wool', 'Synthetic'],
+    "Price Range": ["Under $50", "$50 - $100", "$100 - $200", "Over $200"],
+    Colors: ["Black", "White", "Blue", "Red", "Green"],
+    Sizes: ["XS", "S", "M", "L", "XL"],
+    Material: ["Cotton", "Linen", "Silk", "Wool", "Synthetic"],
   };
 
   const sortOptions = [
-    { value: 'featured', label: 'Featured' },
-    { value: 'newest', label: 'Newest' },
-    { value: 'price-asc', label: 'Price: Low to High' },
-    { value: 'price-desc', label: 'Price: High to Low' },
+    { value: "featured", label: "Featured" },
+    { value: "newest", label: "Newest" },
+    { value: "price-asc", label: "Price: Low to High" },
+    { value: "price-desc", label: "Price: High to Low" },
   ];
 
   const handleQuickshop = (product: Product) => {
     setQuickshopProduct(product);
-    setSelectedColor('');
-    setSelectedSize('');
+    setSelectedColor("");
+    setSelectedSize("");
   };
 
   const handleAddToCart = () => {
-    if (!selectedColor || !selectedSize) {
-      alert('Please select both color and size');
+    if (!quickshopProduct || !selectedColor || !selectedSize) {
+      alert("Please select both color and size");
       return;
     }
-    // Add to cart logic here
-    console.log('Added to cart:', { ...quickshopProduct, color: selectedColor, size: selectedSize });
+
+    addItem({
+      id: quickshopProduct.id,
+      name: quickshopProduct.name,
+      price: quickshopProduct.price,
+      image: quickshopProduct.image,
+      color: selectedColor,
+      size: selectedSize,
+      quantity: 1,
+    });
+
     setQuickshopProduct(null);
+    setSelectedColor("");
+    setSelectedSize("");
   };
 
   const handleFilterChange = (category: string, option: string) => {
-    setSelectedFilters(prev => {
+    setSelectedFilters((prev) => {
       const currentFilters = [...prev[category as keyof typeof prev]];
       const optionIndex = currentFilters.indexOf(option);
-      
+
       if (optionIndex === -1) {
         currentFilters.push(option);
       } else {
@@ -130,20 +145,20 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
 
       return {
         ...prev,
-        [category]: currentFilters
+        [category]: currentFilters,
       };
     });
   };
 
   const getPriceRange = (priceStr: string): [number, number] => {
-    switch(priceStr) {
-      case 'Under $50':
+    switch (priceStr) {
+      case "Under $50":
         return [0, 50];
-      case '$50 - $100':
+      case "$50 - $100":
         return [50, 100];
-      case '$100 - $200':
+      case "$100 - $200":
         return [100, 200];
-      case 'Over $200':
+      case "Over $200":
         return [200, Infinity];
       default:
         return [0, Infinity];
@@ -153,27 +168,29 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
   // Helper function to get filtered products excluding the current filter category
   const getFilteredProductsExcludingCategory = (categoryToExclude: string) => {
     let filtered = [...products];
-    
+
     Object.entries(selectedFilters).forEach(([category, selectedOptions]) => {
       if (category !== categoryToExclude && selectedOptions.length > 0) {
-        filtered = filtered.filter(product => {
-          if (category === 'Price Range') {
-            return selectedOptions.some(range => {
+        filtered = filtered.filter((product) => {
+          if (category === "Price Range") {
+            return selectedOptions.some((range) => {
               const [min, max] = getPriceRange(range);
               return product.price >= min && product.price <= max;
             });
-          } else if (category === 'Colors') {
-            return product.colors.some(color => selectedOptions.includes(color));
-          } else if (category === 'Sizes') {
-            return product.sizes.some(size => selectedOptions.includes(size));
-          } else if (category === 'Material') {
+          } else if (category === "Colors") {
+            return product.colors.some((color) =>
+              selectedOptions.includes(color)
+            );
+          } else if (category === "Sizes") {
+            return product.sizes.some((size) => selectedOptions.includes(size));
+          } else if (category === "Material") {
             return selectedOptions.includes(product.material);
           }
           return true;
         });
       }
     });
-    
+
     return filtered;
   };
 
@@ -181,42 +198,44 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
     let filtered = [...products];
 
     // Apply filters
-    if (selectedFilters['Price Range'].length > 0) {
-      filtered = filtered.filter(product => {
-        return selectedFilters['Price Range'].some(range => {
+    if (selectedFilters["Price Range"].length > 0) {
+      filtered = filtered.filter((product) => {
+        return selectedFilters["Price Range"].some((range) => {
           const [min, max] = getPriceRange(range);
           return product.price >= min && product.price <= max;
         });
       });
     }
 
-    if (selectedFilters['Colors'].length > 0) {
-      filtered = filtered.filter(product =>
-        product.colors.some(color => selectedFilters['Colors'].includes(color))
+    if (selectedFilters["Colors"].length > 0) {
+      filtered = filtered.filter((product) =>
+        product.colors.some((color) =>
+          selectedFilters["Colors"].includes(color)
+        )
       );
     }
 
-    if (selectedFilters['Sizes'].length > 0) {
-      filtered = filtered.filter(product =>
-        product.sizes.some(size => selectedFilters['Sizes'].includes(size))
+    if (selectedFilters["Sizes"].length > 0) {
+      filtered = filtered.filter((product) =>
+        product.sizes.some((size) => selectedFilters["Sizes"].includes(size))
       );
     }
 
-    if (selectedFilters['Material'].length > 0) {
-      filtered = filtered.filter(product =>
-        selectedFilters['Material'].includes(product.material)
+    if (selectedFilters["Material"].length > 0) {
+      filtered = filtered.filter((product) =>
+        selectedFilters["Material"].includes(product.material)
       );
     }
 
     // Apply sorting
     return filtered.sort((a, b) => {
       switch (sortOption) {
-        case 'price-asc':
+        case "price-asc":
           return a.price - b.price;
-        case 'price-desc':
+        case "price-desc":
           return b.price - a.price;
-        case 'newest':
-          return b.id - a.id;
+        case "newest":
+          return parseInt(b.id) - parseInt(a.id);
         default: // 'featured'
           return 0;
       }
@@ -226,44 +245,48 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
   // Calculate available facet options based on current products and filters
   const availableFacets = useMemo(() => {
     // Calculate available options for each filter category
-    const priceRanges = ['Under $50', '$50 - $100', '$100 - $200', 'Over $200'];
+    const priceRanges = ["Under $50", "$50 - $100", "$100 - $200", "Over $200"];
     const availableOptions: Record<string, string[]> = {
-      'Price Range': [],
-      'Colors': [],
-      'Sizes': [],
-      'Material': [],
+      "Price Range": [],
+      Colors: [],
+      Sizes: [],
+      Material: [],
     };
 
     // Price Range
-    const productsForPrice = getFilteredProductsExcludingCategory('Price Range');
-    availableOptions['Price Range'] = priceRanges.filter(range => {
+    const productsForPrice =
+      getFilteredProductsExcludingCategory("Price Range");
+    availableOptions["Price Range"] = priceRanges.filter((range) => {
       const [min, max] = getPriceRange(range);
-      return productsForPrice.some(product => product.price >= min && product.price <= max);
+      return productsForPrice.some(
+        (product) => product.price >= min && product.price <= max
+      );
     });
 
     // Colors
-    const productsForColors = getFilteredProductsExcludingCategory('Colors');
+    const productsForColors = getFilteredProductsExcludingCategory("Colors");
     const uniqueColors = new Set<string>();
-    productsForColors.forEach(product => {
-      product.colors.forEach(color => uniqueColors.add(color));
+    productsForColors.forEach((product) => {
+      product.colors.forEach((color) => uniqueColors.add(color));
     });
-    availableOptions['Colors'] = Array.from(uniqueColors);
+    availableOptions["Colors"] = Array.from(uniqueColors);
 
     // Sizes
-    const productsForSizes = getFilteredProductsExcludingCategory('Sizes');
+    const productsForSizes = getFilteredProductsExcludingCategory("Sizes");
     const uniqueSizes = new Set<string>();
-    productsForSizes.forEach(product => {
-      product.sizes.forEach(size => uniqueSizes.add(size));
+    productsForSizes.forEach((product) => {
+      product.sizes.forEach((size) => uniqueSizes.add(size));
     });
-    availableOptions['Sizes'] = Array.from(uniqueSizes);
+    availableOptions["Sizes"] = Array.from(uniqueSizes);
 
     // Material
-    const productsForMaterial = getFilteredProductsExcludingCategory('Material');
+    const productsForMaterial =
+      getFilteredProductsExcludingCategory("Material");
     const uniqueMaterials = new Set<string>();
-    productsForMaterial.forEach(product => {
+    productsForMaterial.forEach((product) => {
       uniqueMaterials.add(product.material);
     });
-    availableOptions['Material'] = Array.from(uniqueMaterials);
+    availableOptions["Material"] = Array.from(uniqueMaterials);
 
     return availableOptions;
   }, [products, selectedFilters]);
@@ -275,18 +298,26 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
         <nav className="text-sm mb-8">
           <ol className="list-none p-0 inline-flex">
             <li className="flex items-center">
-              <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link
+                href="/"
+                className="text-gray-600 hover:text-gray-900 transition-colors"
+              >
                 Home
               </Link>
               <span className="mx-2 text-gray-400">/</span>
             </li>
             <li className="flex items-center">
-              <Link href={`/category/${category}`} className="text-gray-600 hover:text-gray-900 transition-colors capitalize">
+              <Link
+                href={`/category/${category}`}
+                className="text-gray-600 hover:text-gray-900 transition-colors capitalize"
+              >
                 {category}
               </Link>
               <span className="mx-2 text-gray-400">/</span>
             </li>
-            <li className="text-gray-900 font-medium capitalize">{subcategory}</li>
+            <li className="text-gray-900 font-medium capitalize">
+              {subcategory}
+            </li>
           </ol>
         </nav>
 
@@ -303,7 +334,9 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
           {/* Sidebar Filters - Desktop */}
           <div className="hidden lg:block w-64 flex-shrink-0">
             <div className="sticky top-4">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Filters</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Filters
+              </h2>
               {Object.entries(availableFacets).map(([category, options]) => (
                 <div key={category} className="mb-6">
                   <h3 className="font-medium text-gray-800 mb-3">{category}</h3>
@@ -313,25 +346,33 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
                         <input
                           type="checkbox"
                           className="form-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                          checked={selectedFilters[category as keyof typeof selectedFilters].includes(option)}
+                          checked={selectedFilters[
+                            category as keyof typeof selectedFilters
+                          ].includes(option)}
                           onChange={() => handleFilterChange(category, option)}
                         />
                         <span className="ml-2 text-gray-600 group-hover:text-gray-900 transition-colors">
                           {option}
                           {/* Show count of products for each option */}
-                          {` (${getFilteredProductsExcludingCategory(category).filter(product => {
-                            if (category === 'Price Range') {
-                              const [min, max] = getPriceRange(option);
-                              return product.price >= min && product.price <= max;
-                            } else if (category === 'Colors') {
-                              return product.colors.includes(option);
-                            } else if (category === 'Sizes') {
-                              return product.sizes.includes(option);
-                            } else if (category === 'Material') {
-                              return product.material === option;
-                            }
-                            return false;
-                          }).length})`}
+                          {` (${
+                            getFilteredProductsExcludingCategory(
+                              category
+                            ).filter((product) => {
+                              if (category === "Price Range") {
+                                const [min, max] = getPriceRange(option);
+                                return (
+                                  product.price >= min && product.price <= max
+                                );
+                              } else if (category === "Colors") {
+                                return product.colors.includes(option);
+                              } else if (category === "Sizes") {
+                                return product.sizes.includes(option);
+                              } else if (category === "Material") {
+                                return product.material === option;
+                              }
+                              return false;
+                            }).length
+                          })`}
                         </span>
                       </label>
                     ))}
@@ -351,9 +392,15 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
               />
 
               {/* Sidebar */}
-              <div className={`fixed inset-y-0 left-0 max-w-xs w-full bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${isFilterOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+              <div
+                className={`fixed inset-y-0 left-0 max-w-xs w-full bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+                  isFilterOpen ? "translate-x-0" : "-translate-x-full"
+                }`}
+              >
                 <div className="px-4 py-4 border-b border-gray-200 flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Filters
+                  </h2>
                   <button
                     className="text-gray-500 hover:text-gray-700 transition-colors"
                     onClick={() => setIsFilterOpen(false)}
@@ -363,40 +410,58 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
                 </div>
 
                 <div className="overflow-y-auto h-full p-4">
-                  {Object.entries(availableFacets).map(([category, options]) => (
-                    <div key={category} className="mb-6">
-                      <h3 className="font-medium text-gray-800 mb-3">{category}</h3>
-                      <div className="space-y-2">
-                        {options.map((option) => (
-                          <label key={option} className="flex items-center group">
-                            <input
-                              type="checkbox"
-                              className="form-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                              checked={selectedFilters[category as keyof typeof selectedFilters].includes(option)}
-                              onChange={() => handleFilterChange(category, option)}
-                            />
-                            <span className="ml-2 text-gray-600 group-hover:text-gray-900 transition-colors">
-                              {option}
-                              {/* Show count of products for each option */}
-                              {` (${getFilteredProductsExcludingCategory(category).filter(product => {
-                                if (category === 'Price Range') {
-                                  const [min, max] = getPriceRange(option);
-                                  return product.price >= min && product.price <= max;
-                                } else if (category === 'Colors') {
-                                  return product.colors.includes(option);
-                                } else if (category === 'Sizes') {
-                                  return product.sizes.includes(option);
-                                } else if (category === 'Material') {
-                                  return product.material === option;
+                  {Object.entries(availableFacets).map(
+                    ([category, options]) => (
+                      <div key={category} className="mb-6">
+                        <h3 className="font-medium text-gray-800 mb-3">
+                          {category}
+                        </h3>
+                        <div className="space-y-2">
+                          {options.map((option) => (
+                            <label
+                              key={option}
+                              className="flex items-center group"
+                            >
+                              <input
+                                type="checkbox"
+                                className="form-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                                checked={selectedFilters[
+                                  category as keyof typeof selectedFilters
+                                ].includes(option)}
+                                onChange={() =>
+                                  handleFilterChange(category, option)
                                 }
-                                return false;
-                              }).length})`}
-                            </span>
-                          </label>
-                        ))}
+                              />
+                              <span className="ml-2 text-gray-600 group-hover:text-gray-900 transition-colors">
+                                {option}
+                                {/* Show count of products for each option */}
+                                {` (${
+                                  getFilteredProductsExcludingCategory(
+                                    category
+                                  ).filter((product) => {
+                                    if (category === "Price Range") {
+                                      const [min, max] = getPriceRange(option);
+                                      return (
+                                        product.price >= min &&
+                                        product.price <= max
+                                      );
+                                    } else if (category === "Colors") {
+                                      return product.colors.includes(option);
+                                    } else if (category === "Sizes") {
+                                      return product.sizes.includes(option);
+                                    } else if (category === "Material") {
+                                      return product.material === option;
+                                    }
+                                    return false;
+                                  }).length
+                                })`}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               </div>
             </>
@@ -449,8 +514,12 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
                       Quick Shop
                     </button>
                   </div>
-                  <h3 className="p-2 text-sm font-medium text-gray-900 group-hover:text-gray-700 transition-colors">{product.name}</h3>
-                  <p className="p-2 mt-1 text-gray-600 font-medium">${product.price}</p>
+                  <h3 className="p-2 text-sm font-medium text-gray-900 group-hover:text-gray-700 transition-colors">
+                    {product.name}
+                  </h3>
+                  <p className="p-2 mt-1 text-gray-600 font-medium">
+                    ${product.price}
+                  </p>
                 </Link>
               ))}
             </div>
@@ -491,7 +560,9 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
                   </div>
 
                   <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Color</h4>
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">
+                      Color
+                    </h4>
                     <div className="flex flex-wrap gap-2">
                       {quickshopProduct.colors.map((color) => (
                         <button
@@ -499,8 +570,8 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
                           onClick={() => setSelectedColor(color)}
                           className={`px-3 py-1 border rounded-full text-sm transition-all ${
                             selectedColor === color
-                              ? 'border-indigo-600 bg-indigo-600 text-white'
-                              : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                              ? "border-indigo-600 bg-indigo-600 text-white"
+                              : "border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                           }`}
                         >
                           {color}
@@ -510,7 +581,9 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
                   </div>
 
                   <div className="mb-6">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Size</h4>
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">
+                      Size
+                    </h4>
                     <div className="flex flex-wrap gap-2">
                       {quickshopProduct.sizes.map((size) => (
                         <button
@@ -518,8 +591,8 @@ export default function SubcategoryPage({ params }: SubcategoryPageProps) {
                           onClick={() => setSelectedSize(size)}
                           className={`w-10 h-10 flex items-center justify-center border rounded-lg text-sm transition-all ${
                             selectedSize === size
-                              ? 'border-indigo-600 bg-indigo-600 text-white'
-                              : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                              ? "border-indigo-600 bg-indigo-600 text-white"
+                              : "border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                           }`}
                         >
                           {size}

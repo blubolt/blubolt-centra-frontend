@@ -1,33 +1,15 @@
 import React from "react";
-import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import { generateMetadata } from "@/components/CanonicalMetadata";
 import Header from "@/components/layout/Header";
+import Providers from "@/components/providers/Providers";
 import "./globals.css";
+import { metadata, viewport } from './metadata';
 
 const geistSans = GeistSans;
 const geistMono = GeistMono;
 
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-};
-
-export const metadata: Metadata = generateMetadata({
-  path: '/',
-  title: 'Blubolt x Centra',
-  description: 'Blubolt Centra accelerator ecommerce platform',
-  locales: ['en'],
-  additionalMetadata: {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
-    manifest: '/manifest.json',
-    icons: {
-      icon: '/favicon.ico'
-    },
-  },
-});
+export { metadata, viewport };
 
 export default function RootLayout({
   children,
@@ -39,10 +21,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Header />
-        <main className="min-h-screen bg-white">
-          {children}
-        </main>
+        <Providers>
+          <Header />
+          <main className="min-h-screen bg-white">
+            {children}
+          </main>
+        </Providers>
       </body>
     </html>
   );

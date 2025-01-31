@@ -1,17 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Dialog, Transition, DialogTitle } from '@headlessui/react';
-import { XCircleIcon } from '@heroicons/react/outline';
-import Link from 'next/link';
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
+import { Fragment } from "react";
+import { Dialog } from "@headlessui/react";
+import { XIcon } from "@heroicons/react/outline";
+import Link from "next/link";
+import { useCart } from "@/contexts/CartContext";
 
 interface MiniCartProps {
   isOpen: boolean;
@@ -19,137 +12,164 @@ interface MiniCartProps {
 }
 
 const MiniCart = ({ isOpen, setIsOpen }: MiniCartProps) => {
-  // Mock cart items - in a real app, this would come from your cart state management
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      name: 'Basic T-Shirt',
-      price: 29.99,
-      quantity: 1,
-      image: '/images/placeholder.jpg',
-    },
-  ]);
+  const { items, removeItem, updateQuantity, getTotal } = useCart();
+  const total = getTotal();
 
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
-  };
+  if (!isOpen) return null;
 
   return (
-    <Transition show={isOpen} as="div">
-      <Dialog as="div" className="fixed inset-0 overflow-hidden z-50" onClose={setIsOpen}>
-        <div className="absolute inset-0 overflow-hidden">
-          <Transition
-            as="div"
-            enter="ease-in-out duration-500"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in-out duration-500"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-          </Transition>
+    <Dialog
+      as="div"
+      className="fixed inset-0 z-50 overflow-y-auto"
+      onClose={setIsOpen}
+      open={isOpen}
+    >
+      <div className="min-h-screen text-center">
+        <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
 
-          <div className="fixed inset-y-0 right-0 pl-10 max-w-full flex">
-            <Transition
-              as="div"
-              enter="transform transition ease-in-out duration-500"
-              enterFrom="translate-x-full"
-              enterTo="translate-x-0"
-              leave="transform transition ease-in-out duration-500"
-              leaveFrom="translate-x-0"
-              leaveTo="translate-x-full"
-            >
-              <div className="w-screen max-w-md">
-                <div className="h-full flex flex-col bg-white shadow-xl">
-                  <div className="flex-1 py-6 overflow-y-auto px-4 sm:px-6">
-                    <div className="flex items-start justify-between">
-                      <DialogTitle className="text-lg font-medium text-gray-900">Shopping cart</DialogTitle>
-                      <div className="ml-3 h-7 flex items-center">
-                        <button
-                          type="button"
-                          className="bg-white rounded-md text-gray-400 hover:text-gray-500"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <span className="sr-only">Close panel</span>
-                          <XCircleIcon className="h-6 w-6" aria-hidden="true" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="mt-8">
-                      <div className="flow-root">
-                        <ul role="list" className="-my-6 divide-y divide-gray-200">
-                          {cartItems.map((item) => (
-                            <li key={item.id} className="py-6 flex">
-                              <div className="flex-shrink-0 w-24 h-24 border border-gray-200 rounded-md overflow-hidden">
-                                <img
-                                  src={item.image}
-                                  alt={item.name}
-                                  className="w-full h-full object-center object-cover"
-                                />
-                              </div>
-
-                              <div className="ml-4 flex-1 flex flex-col">
-                                <div>
-                                  <div className="flex justify-between text-base font-medium text-gray-900">
-                                    <h3>{item.name}</h3>
-                                    <p className="ml-4">${item.price}</p>
-                                  </div>
-                                </div>
-                                <div className="flex-1 flex items-end justify-between text-sm">
-                                  <p className="text-gray-500">Qty {item.quantity}</p>
-                                  <button
-                                    type="button"
-                                    onClick={() => removeItem(item.id)}
-                                    className="font-medium text-indigo-600 hover:text-indigo-500"
-                                  >
-                                    Remove
-                                  </button>
-                                </div>
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
+        <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
+          <div className="w-screen max-w-md">
+            <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+              <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+                <div className="flex items-start justify-between">
+                  <Dialog.Title className="text-lg font-medium text-gray-900">
+                    Shopping cart
+                  </Dialog.Title>
+                  <div className="ml-3 flex h-7 items-center">
+                    <button
+                      type="button"
+                      className="relative -m-2 p-2 text-gray-400 hover:text-gray-500"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span className="absolute -inset-0.5" />
+                      <span className="sr-only">Close panel</span>
+                      <XIcon className="h-6 w-6" aria-hidden="true" />
+                    </button>
                   </div>
+                </div>
 
-                  <div className="border-t border-gray-200 py-6 px-4 sm:px-6">
-                    <div className="flex justify-between text-base font-medium text-gray-900">
-                      <p>Subtotal</p>
-                      <p>${total.toFixed(2)}</p>
-                    </div>
-                    <p className="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
-                    <div className="mt-6">
-                      <Link
-                        href="/cart"
-                        className="flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-                      >
-                        View Cart
-                      </Link>
-                    </div>
-                    <div className="mt-6 flex justify-center text-sm text-center text-gray-500">
-                      <p>
-                        or{' '}
-                        <button
-                          type="button"
-                          className="text-indigo-600 font-medium hover:text-indigo-500"
-                          onClick={() => setIsOpen(false)}
+                <div className="mt-8">
+                  <div className="flow-root">
+                    <ul role="list" className="-my-6 divide-y divide-gray-200">
+                      {items.map((item) => (
+                        <li
+                          key={`${item.id}-${item.color}-${item.size}`}
+                          className="flex py-6"
                         >
-                          Continue Shopping<span aria-hidden="true"> &rarr;</span>
-                        </button>
-                      </p>
-                    </div>
+                          <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="h-full w-full object-cover object-center"
+                            />
+                          </div>
+
+                          <div className="ml-4 flex flex-1 flex-col">
+                            <div>
+                              <div className="flex justify-between text-base font-medium text-gray-900">
+                                <h3>
+                                  <Link
+                                    href={`/product/${item.id}`}
+                                    className="hover:text-gray-700"
+                                  >
+                                    {item.name}
+                                  </Link>
+                                </h3>
+                                <p className="ml-4">${item.price.toFixed(2)}</p>
+                              </div>
+                              <p className="mt-1 text-sm text-gray-500">
+                                {item.color} | {item.size}
+                              </p>
+                            </div>
+                            <div className="flex flex-1 items-end justify-between text-sm">
+                              <div className="flex items-center">
+                                <button
+                                  onClick={() =>
+                                    updateQuantity(
+                                      item.id,
+                                      item.color,
+                                      item.size,
+                                      Math.max(0, item.quantity - 1)
+                                    )
+                                  }
+                                  className="text-gray-500 hover:text-gray-700 p-1"
+                                >
+                                  -
+                                </button>
+                                <span className="mx-2 text-gray-700">
+                                  Qty {item.quantity}
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    updateQuantity(
+                                      item.id,
+                                      item.color,
+                                      item.size,
+                                      item.quantity + 1
+                                    )
+                                  }
+                                  className="text-gray-500 hover:text-gray-700 p-1"
+                                >
+                                  +
+                                </button>
+                              </div>
+
+                              <div className="flex">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removeItem(item.id, item.color, item.size)
+                                  }
+                                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </div>
-            </Transition>
+
+              <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
+                <div className="flex justify-between text-base font-medium text-gray-900">
+                  <p>Subtotal</p>
+                  <p>${total.toFixed(2)}</p>
+                </div>
+                <p className="mt-0.5 text-sm text-gray-500">
+                  Shipping and taxes calculated at checkout.
+                </p>
+                <div className="mt-6">
+                  <Link
+                    href="/cart"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                  >
+                    Checkout
+                  </Link>
+                </div>
+                <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
+                  <p>
+                    or{" "}
+                    <button
+                      type="button"
+                      className="font-medium text-indigo-600 hover:text-indigo-500"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Continue Shopping
+                      <span aria-hidden="true"> &rarr;</span>
+                    </button>
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </Dialog>
-    </Transition>
+      </div>
+    </Dialog>
   );
 };
 
