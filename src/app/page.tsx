@@ -1,6 +1,9 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
+import Slideshow from '@/components/Slideshow';
 
 export default function Home() {
   const newArrivals = [
@@ -30,29 +33,34 @@ export default function Home() {
     },
   ];
 
+  const slides = [
+    {
+      image: '/images/placeholder.jpg',
+      title: 'blubolt x Centra',
+      description: 'Welcome to the blubolt Centra accelerator',
+      buttonText: 'Shop Now',
+      buttonLink: '/category/shop'
+    },
+    {
+      image: '/images/placeholder.jpg',
+      title: 'New Collection',
+      description: 'Discover our latest arrivals for the season',
+      buttonText: 'Shop Collection',
+      buttonLink: '/category/new-arrivals'
+    },
+    {
+      image: '/images/placeholder.jpg',
+      title: 'Summer Sale',
+      description: 'Up to 50% off on selected items',
+      buttonText: 'Shop Sale',
+      buttonLink: '/category/sale'
+    }
+  ];
+
   return (
     <Layout>
-      {/* Hero Section */}
-      <section 
-        className="w-full h-max relative bg-cover bg-center"
-        style={{ backgroundImage: 'url("/images/placeholder.jpg")' }}
-      >
-        <div className="absolute inset-0 bg-black/50 z-10" />
-        <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center items-center text-white text-center">
-          <h1 className="mt-60 text-5xl md:text-7xl font-portrait mb-6 font-bold">
-            blubolt x Centra
-          </h1>
-          <p className="text-xl mb-16 md:text-2xl mb-8 max-w-2xl text-gray-100">
-          Welcome to the blubolt Centra accelerator
-          </p>
-          <Link
-            href="/category/shop"
-            className="bg-white mb-60 text-gray-900 px-8 py-3 text-lg font-medium hover:bg-gray-100 transition-colors"
-          >
-            Shop Now
-          </Link>
-        </div>
-      </section>
+      {/* Hero Slideshow */}
+      <Slideshow slides={slides} className="w-full" />
 
       <section className="w-full py-16 bg-gray-50">
         <div className='container mx-auto px-4'>
@@ -65,7 +73,7 @@ export default function Home() {
           <p className="text-lg md:text-xl text-gray-700 mb-8">
             Featuring some core components and features, such as a navigation bar, a footer, and a hero section, it is designed to be a starting point for your own Centra build.
           </p>
-          </div>
+        </div>
       </section>
 
       {/* Featured Categories */}
